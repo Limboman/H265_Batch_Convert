@@ -34,7 +34,7 @@ for files in os.listdir(cwd):
                 inputs={files: '-hide_banner'},
                 # inputs={files: '-hide_banner -hwaccel cuvid'},
                 outputs={os.path.splitext(files)[0] + '[HEVC].mp4': '-c:a aac -c:v libx265 -preset slow'}
-                # outputs={files.split('.')[0] + '[HEVC].mp4': '-c:a aac -c:v hevc_nvenc -preset slow'}
+                # outputs={os.path.splitext(files)[0] + '[HEVC].mp4': '-c:a aac -c:v hevc_nvenc -preset slow'}
             )
             ff.run()
             shutil.move(files, cwd + '\\converted\\' + files)
