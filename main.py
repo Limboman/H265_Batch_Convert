@@ -7,8 +7,8 @@ from pymediainfo import MediaInfo
 cwd = os.getcwd()  # gets the working directory
 os.environ['PATH'] = os.path.dirname(cwd+'\\Mediainfo.dll') + ';' + os.environ['PATH']
 
-os.chdir('E:\\testing')
-cwd = os.getcwd()
+# os.chdir('E:\\testing')
+# cwd = os.getcwd()
 
 video = False
 
@@ -21,7 +21,7 @@ for files in os.listdir(cwd):
 
     if video:
 
-        fp = FFprobe(inputs={'test.mp4': '-v error -select_streams v:0 -show_entries stream=codec_name,height,width -of default=noprint_wrappers=1:nokey=1'})
+        fp = FFprobe(inputs={files: '-v error -select_streams v:0 -show_entries stream=codec_name,height,width -of default=noprint_wrappers=1:nokey=1'})
         probe = fp.run(stdout=subprocess.PIPE)
         result = probe[0].split('\r\n')
         print result
