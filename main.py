@@ -33,7 +33,7 @@ for files in os.listdir(cwd):
             ff = FFmpeg(
                 inputs={files: '-hide_banner'},
                 # inputs={files: '-hide_banner -hwaccel cuvid'},
-                outputs={files.split('.')[0] + '[HEVC].mp4': '-c:a aac -c:v libx265 -preset slow'}
+                outputs={os.path.splitext(files)[0] + '[HEVC].mp4': '-c:a aac -c:v libx265 -preset slow'}
                 # outputs={files.split('.')[0] + '[HEVC].mp4': '-c:a aac -c:v hevc_nvenc -preset slow'}
             )
             ff.run()
