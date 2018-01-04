@@ -7,7 +7,7 @@ from pymediainfo import MediaInfo
 cwd = os.getcwd()  # gets the working directory
 os.environ['PATH'] = os.path.dirname(cwd+'\\Mediainfo.dll') + ';' + os.environ['PATH']
 
-# os.chdir('E:\\testing')
+# os.chdir('P:\test')
 # cwd = os.getcwd()
 
 video = False
@@ -18,14 +18,12 @@ for files in os.listdir(cwd):
     for track in fileInfo.tracks:
         if track.track_type == "Video":
             video = True
-
     if video:
-
         fp = FFprobe(inputs={files: '-v error -select_streams v:0 -show_entries stream=codec_name,height,width -of default=noprint_wrappers=1:nokey=1'})
         probe = fp.run(stdout=subprocess.PIPE)
         result = probe[0].split('\r\n')
         print result
-        if result[2] >= 700 and result[0] != 'h265':
+        if int(result[2]) >= 700 and result[0] != 'hevc':
             if not os.path.exists(cwd + '\\converted\\'):
                 os.mkdir(cwd + '\\converted\\')
             print 'convert'
@@ -38,10 +36,10 @@ for files in os.listdir(cwd):
             )
             ff.run()
             shutil.move(files, cwd + '\\converted\\' + files)
+        elif result[0] == 'hevc':
+            print 'already HEVC'
         else:
             if not os.path.exists(cwd + '\\to_small_to_convert\\'):
                 os.mkdir(cwd + '\\to_small_to_convert\\')
             # move file
             shutil.move(files, cwd + '\\to_small_to_convert\\' + files)
-
-
