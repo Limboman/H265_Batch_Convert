@@ -12,8 +12,8 @@ def isclose(a, b, rel_tol=0.005, abs_tol=0.0):
 cwd = os.getcwd()  # gets the working directory
 os.environ['PATH'] = os.path.dirname(cwd+'\\Mediainfo.dll') + ';' + os.environ['PATH']
 
-os.chdir('C:\\Users\\Cam\Desktop\\testing\\test')
-cwd = os.getcwd()
+# os.chdir('C:\\Users\\Cam\Desktop\\testing\\test')
+# cwd = os.getcwd()
 
 video = False
 
@@ -31,8 +31,6 @@ for root, directories, filenames in os.walk(cwd):
 			result = probe[0].split('\r\n')
 			print result
 			if int(result[2]) >= 700 and result[0] != 'hevc':
-				if not os.path.exists(root + '\\Problem\\'):
-					os.mkdir(root + '\\Problem\\')
 				print 'convert'
 				print files.split('.')[0] + '[HEVC].mp4'
 				ff = FFmpeg(
@@ -57,6 +55,8 @@ for root, directories, filenames in os.walk(cwd):
 						pass
 				else:
 					print "move"
+					if not os.path.exists(root + '\\Problem\\'):
+						os.mkdir(root + '\\Problem\\')
 					shutil.move(files, root + '\\Problem\\' + os.path.basename(files))
 			elif result[0] == 'hevc':
 				print 'already HEVC'
