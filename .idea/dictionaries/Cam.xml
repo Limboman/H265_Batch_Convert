@@ -2,11 +2,16 @@
   <dictionary name="Cam">
     <words>
       <w>cuvid</w>
+      <w>filenames</w>
       <w>hevc</w>
       <w>hwaccel</w>
       <w>libx</w>
       <w>mediainfo</w>
+      <w>mkdir</w>
+      <w>muxing</w>
+      <w>noprint</w>
       <w>nvenc</w>
+      <w>shutil</w>
     </words>
   </dictionary>
 </component>
