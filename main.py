@@ -36,10 +36,10 @@ for root, directories, filenames in os.walk(cwd):
 				print 'convert'
 				print files.split('.')[0] + '[HEVC].mp4'
 				ff = FFmpeg(
-					inputs={files: '-hide_banner'},
-					# inputs={files: '-hide_banner -hwaccel cuvid'},
-					outputs={os.path.splitext(files)[0] + '[HEVC].mp4': '-max_muxing_queue_size 8000 -c:a aac -c:v libx265 -preset slow'}
-					# outputs={os.path.splitext(files)[0] + '[HEVC].mp4': '-max_muxing_queue_size 8000 -c:a aac -c:v hevc_nvenc -preset slow'}
+					# inputs={files: '-hide_banner'},
+					inputs={files: '-hide_banner -hwaccel cuvid'},
+					# outputs={os.path.splitext(files)[0] + '[HEVC].mp4': '-max_muxing_queue_size 8000 -c:a aac -c:v libx265 -preset slow'}
+					outputs={os.path.splitext(files)[0] + '[HEVC].mp4': '-max_muxing_queue_size 8000 -c:a aac -c:v hevc_nvenc -preset slow'}
 				)
 				ff.run()
 				# Check to see if the duration of the new file is within 0.05% of the old one
