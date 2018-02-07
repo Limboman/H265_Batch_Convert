@@ -48,6 +48,8 @@ for root, directories, filenames in os.walk(cwd):
 					# Check to see if the duration of the new file is within 0.05% of the old one
 					filecheck_orig = MediaInfo.parse(files)
 					filecheck_hevc = MediaInfo.parse(os.path.splitext(files)[0] + '[HEVC].mp4')
+					orig_check_result = 0
+					hevc_check_result = -999
 					for track_orig in filecheck_orig.tracks:
 						if track_orig.track_type == "Video":
 							if track_orig.duration is not None:
