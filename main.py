@@ -15,18 +15,55 @@ os.environ['PATH'] = os.path.dirname(cwd+'\\Mediainfo.dll') + ';' + os.environ['
 # os.chdir('C:\\Users\\Cam\Desktop\\testing\\test')
 # cwd = os.getcwd()
 
+orig_dir = cwd
+
 usr_input = raw_input("Root path for conversion: ")
 if usr_input != "":
 	cwd = usr_input
 
+file_name = usr_input.replace('\\', '')
+file_name = file_name.replace(':', '')
+
+try:
+	progress_file = open(orig_dir + '\\'+file_name+'.txt', 'r+')
+except IOError:
+	progress_file = open(orig_dir + '\\'+file_name+'.txt', 'w')
+progress_file.close()
+
+progress_file = open(orig_dir + '\\'+file_name+'.txt', 'r+')
+file_data = progress_file.readlines()
+progress_file.close()
+
+upto = ''
+
+for data_line in file_data:
+		upto = data_line
+
 video = False
+skip = False
+if upto == '':
+	found = True
+else:
+	found = False
+
 
 for root, directories, filenames in os.walk(cwd):
+	skip = False
+	if root != upto and found is False:
+		skip = True
+	if skip is True:
+		# directories[:] = []
+		filenames[:] = []
+	if found is True:
+		progress_file = open(orig_dir + '\\' + file_name + '.txt', 'w')
+		progress_file.write(root)
+		progress_file.close()
 	for filename in filenames:
-		files = os.path.join(root, filename)
-		fileInfo = MediaInfo.parse(files)
-		video = False
-		if os.path.splitext(filename)[1] not in ('.jpg', '.png', '.jpeg', '.bmp', '.swf', '.JPG', '.PNG', '.JPEG', '.BMP', '.SWF'):
+		found = True
+		if os.path.splitext(filename)[1] not in ('.jpg', '.png', '.jpeg', '.bmp', '.swf', '.pdf', '.JPG', '.PNG', '.JPEG', '.BMP', '.SWF', '.PDF'):
+			files = os.path.join(root, filename)
+			fileInfo = MediaInfo.parse(files)
+			video = False
 			for track in fileInfo.tracks:
 				if track.track_type == "Video":
 					video = True
@@ -34,7 +71,7 @@ for root, directories, filenames in os.walk(cwd):
 				fp = FFprobe(inputs={files: '-v error -select_streams v:0 -show_entries stream=codec_name,height,width -of default=noprint_wrappers=1:nokey=1'})
 				probe = fp.run(stdout=subprocess.PIPE)
 				result = probe[0].split('\r\n')
-				print str(result) + ' ' + filename
+				print str(result) + ' ' + files
 				if result.count > 2:
 					if int(result[2]) >= 700 and result[0] != 'hevc':
 						print 'convert'
