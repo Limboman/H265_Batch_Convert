@@ -37,7 +37,7 @@ progress_file.close()
 upto = ''
 
 for data_line in file_data:
-		upto = data_line
+	upto = data_line
 
 video = False
 skip = False
@@ -48,11 +48,15 @@ else:
 
 
 for root, directories, filenames in os.walk(cwd):
+	print root
 	skip = False
 	if root != upto and found is False:
 		skip = True
 	if skip is True:
 		# directories[:] = []
+		filenames[:] = []
+	roottest = str(root)
+	if roottest.split('\\')[-1] in ('BigProblem', 'Problem', 'Error'):
 		filenames[:] = []
 	if found is True:
 		progress_file = open(orig_dir + '\\' + file_name + '.txt', 'w')
@@ -60,7 +64,7 @@ for root, directories, filenames in os.walk(cwd):
 		progress_file.close()
 	for filename in filenames:
 		found = True
-		if os.path.splitext(filename)[1] not in ('.jpg', '.png', '.jpeg', '.bmp', '.swf', '.pdf', '.JPG', '.PNG', '.JPEG', '.BMP', '.SWF', '.PDF'):
+		if os.path.splitext(filename)[1] not in ('.jpg', '.png', '.jpeg', '.bmp', '.swf', '.pdf', '.m3u', '.JPG', '.PNG', '.JPEG', '.BMP', '.SWF', '.PDF', '.M3U'):
 			files = os.path.join(root, filename)
 			fileInfo = MediaInfo.parse(files)
 			video = False
@@ -77,40 +81,53 @@ for root, directories, filenames in os.walk(cwd):
 						print 'convert'
 						print files.split('.')[0] + '[HEVC].mp4'
 						ff = FFmpeg(
-							# inputs={files: '-hide_banner'},
-							inputs={files: '-hide_banner -hwaccel cuvid'},
+							# inputs={files: '-hide_banner -y'},
+							inputs={files: '-hide_banner -y -hwaccel cuvid'},
 							# outputs={os.path.splitext(files)[0] + '[HEVC].mp4': '-max_muxing_queue_size 8000 -c:a aac -c:v libx265 -preset slow'}
 							outputs={os.path.splitext(files)[0] + '[HEVC].mp4': '-max_muxing_queue_size 8000 -c:a aac -c:v hevc_nvenc -preset slow'}
 						)
-						ff.run()
-						# Check to see if the duration of the new file is within 0.05% of the old one
-						filecheck_orig = MediaInfo.parse(files)
-						filecheck_hevc = MediaInfo.parse(os.path.splitext(files)[0] + '[HEVC].mp4')
-						orig_check_result = 0
-						hevc_check_result = -999
-						for track_orig in filecheck_orig.tracks:
-							if track_orig.track_type == "Video":
-								if track_orig.duration is not None:
-									orig_check_result = track_orig.duration
-								else:
-									orig_check_result = 0
-						for track_hevc in filecheck_hevc.tracks:
-							if track_hevc.track_type == "Video":
-								if track_hevc.duration is not None:
-									hevc_check_result = track_hevc.duration
-								else:
-									hevc_check_result = -999
-						if isclose(float(hevc_check_result), float(orig_check_result)):
-							print "delete"
-							try:
-								os.remove(files)
-							except OSError:
-								pass
-						else:
-							print "Problem"
-							if not os.path.exists(root + '\\Problem\\'):
-								os.mkdir(root + '\\Problem\\')
-							shutil.move(files, root + '\\Problem\\' + os.path.basename(files))
+						try:
+							ff.run()
+							# Check to see if the duration of the new file is within 0.05% of the old one
+							filecheck_orig = MediaInfo.parse(files)
+							filecheck_hevc = MediaInfo.parse(os.path.splitext(files)[0] + '[HEVC].mp4')
+							orig_check_result = 0
+							hevc_check_result = -999
+							for track_orig in filecheck_orig.tracks:
+								if track_orig.track_type == "Video":
+									if track_orig.duration is not None:
+										orig_check_result = track_orig.duration
+									else:
+										orig_check_result = 0
+							for track_hevc in filecheck_hevc.tracks:
+								if track_hevc.track_type == "Video":
+									if track_hevc.duration is not None:
+										hevc_check_result = track_hevc.duration
+									else:
+										hevc_check_result = -999
+							if isclose(float(hevc_check_result), float(orig_check_result)):
+								print "delete"
+								try:
+									os.remove(files)
+								except OSError:
+									pass
+							else:
+								print "Problem"
+								if not os.path.exists(root + '\\Problem\\'):
+									os.mkdir(root + '\\Problem\\')
+								shutil.move(files, root + '\\Problem\\' + os.path.basename(files))
+						except Exception, e:
+							# error durring conversion
+							print repr(e)
+							print "Error Durring Conversion"
+							if not os.path.exists(root + '\\Error\\'):
+								os.mkdir(root + '\\Error\\')
+							if os.path.exists(os.path.splitext(files)[0] + '[HEVC].mp4'):
+								os.remove(os.path.splitext(files)[0] + '[HEVC].mp4')
+							shutil.move(files, root + '\\Error\\' + os.path.basename(files))
+							error_file = open(root + '\\Error\\' + os.path.basename(files) + '.txt', 'w')
+							error_file.write(repr(e))
+							error_file.close()
 					elif result[0] == 'hevc':
 						print 'already HEVC'
 					else:
